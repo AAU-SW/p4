@@ -13,6 +13,18 @@ Store values in variables, e.g., last release year, etc.
 - Variables need to be defined before usage.
 - Variables are strongly typed.
 
+Something alike `today()` **FILL THIS OUT**
+
+```
+Float today = today()
+```
+
+<!-- 
+Could have: Date parsing to unix timestamp
+E.g. `Date release_date = parse_date(12-23-2026)`
+(Should it come with a Date type or just use float?)
+ -->
+
 #### Usage
 
 To initiate a variable, write the type in title case, then the name of the variable and the value.
@@ -60,12 +72,6 @@ String releaseDate = "01/04-2026"
 String todaysDate = "02/03-2026"
 
 if(releaseDate <= todaysDate) {
-    is_released = true;
-} else {
-    is_released = false;
-}
-
-if (is_released) {
     ## 🚀 Release Notes
     
     Version 2.0.0
@@ -76,7 +82,6 @@ if (is_released) {
     
     Bug Fixes:
     - The equal operator now evaluates the value, and not type.
-
 } else {
     ## 🚀 Release Notes
     
@@ -109,3 +114,4 @@ End each line with a  semicolon `;`.
 
 ## Example
 
+**FILL THIS OUT**
