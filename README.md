@@ -37,9 +37,12 @@ Define abbreviations, people, etc.
 Used to ensure no terms, abbreviations or people are mentioned as "should be known" before they are defined clearly.
 
 #### Usage
-
-Fill out
-
+```mds
+Abbr API = "Application Programming Interface";
+Abbr CI = "Continuous Integration";
+Abbr MDS = "Markdowns Structured Language";
+Abbr SW4 = "Software Engineering Group 4";
+```
 ### Conditionals
 
 Conditional rendering. Can use binary comparisons with hardcoded values and variables. Comparisons need to be done between to values of equal type.
@@ -52,7 +55,39 @@ Larger than `>`
 
 Larger than or equal to `>=`
 
-to be continued.
+```mds
+String releaseDate = "01/04-2026" 
+String todaysDate = "02/03-2026"
+
+if(releaseDate <= todaysDate) {
+    is_released = true;
+} else {
+    is_released = false;
+}
+
+if (is_released) {
+    ## 🚀 Release Notes
+    
+    Version 2.0.0
+    
+    New Features:
+    - Extended glossary types
+    - Added Mathematical Operations
+    
+    Bug Fixes:
+    - The equal operator now evaluates the value, and not type.
+
+} else {
+    ## 🚀 Release Notes
+    
+    Version 1.0.0
+    
+    New Features:
+    - Introduced variables.
+    - Introduced glossary.
+    - Introduced conditionals
+}
+```
 
 <!-- 
 Could have: 
