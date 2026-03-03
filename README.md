@@ -114,4 +114,4 @@ End each line with a  semicolon `;`.
 
 ## Example
 
-**FILL THIS OUT**
+This document was compiled from Markdowns. See the `.mds` file here: [README.mds](README.mds)
