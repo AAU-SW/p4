@@ -38,10 +38,10 @@ Used to ensure no terms, abbreviations or people are mentioned as "should be kno
 
 #### Usage
 ```mds
-String API = "Application Programming Interface";
-String CI = "Continuous Integration";
-String MDS = "Markdowns Structured Language";
-String SW4 = "Software Engineering Group 4";
+Abbr API = "Application Programming Interface";
+Abbr CI = "Continuous Integration";
+Abbr MDS = "Markdowns Structured Language";
+Abbr SW4 = "Software Engineering Group 4";
 ```
 ### Conditionals
 
@@ -59,7 +59,7 @@ Larger than or equal to `>=`
 String releaseDate = "01/04-2026" 
 String todaysDate = "02/03-2026"
 
-if(releaseDate == todaysDate) {
+if(releaseDate <= todaysDate) {
     is_released = true;
 } else {
     is_released = false;
