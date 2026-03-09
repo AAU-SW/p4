@@ -14,9 +14,17 @@ type binop =
 
 type expr =
   | Ec of constant
-  | Ebinop of binop * expr * expr      (* binary operation *)
+  | Eid of string
+  | Ebinop of binop * expr * expr       (* binary operation *)
 
 type stmt =
   | Sassign of string * expr            (* assignment *)
   | Sseq of stmt * stmt                 (* sequence of statements *)
   | Sif of expr * stmt * stmt           (* if-then-else *)
+
+type doc_element =
+  | RawText of string
+  | Annotation of string
+  | Script of stmt                      (* The §§ or §/ /§ blocks *)
+
+type document = doc_element list
