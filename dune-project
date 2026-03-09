@@ -5,7 +5,7 @@
 (generate_opam_files true)
 
 (source
- (github username/reponame))
+ (github AAU-SW/p4))
 
 (authors "P4 <cs-26-sw-kbh-4-gr-6@student.aau.dk>")
 
@@ -13,11 +13,11 @@
 
 (license LICENSE)
 
-(documentation https://url/to/documentation)
+(documentation https://github.com/AAU-SW/p4/blob/main/README.md)
 
 (package
  (name p4)
- (synopsis "A short synopsis")
+ (synopsis "P4: Markdowns, a Markdown Scripting Language")
  (description "A longer description")
  (depends ocaml)
  (tags
