@@ -13,7 +13,7 @@
         "and", AND; "or", OR; "not", NOT;
         "true", CST (Cbool true);
         "false", CST (Cbool false);
-        "Float", FLOAT; "Bool", BOOL; "String", STRING;
+        "Float", FLOAT; "Bool", BOOL; "String", STRING; "Abbr", ABBREVIATION;
       ];
     fun s -> try Hashtbl.find h s with Not_found -> IDENT s
 
