@@ -3,20 +3,20 @@ type abbreviation = string
 
 type constant =
   | Cn of float
-  | Cb of bool 
+  | Cb of bool
   | Cs of string
   | Ca of abbreviation
 
 type binop =
   | Badd | Bsub | Bmul | Bdiv | Bmod    (* + - * // % *)
   | Beq | Bneq | Blt | Ble | Bgt | Bge  (* == != < <= > >= *)
-  | Band | Bor                          (* and or *)                        
+  | Band | Bor                          (* and or *)
 
 type expr =
   | Ec of constant
   | Ebinop of binop * expr * expr      (* binary operation *)
 
-type stmt = 
+type stmt =
   | Sassign of string * expr            (* assignment *)
   | Sseq of stmt * stmt                 (* sequence of statements *)
   | Sif of expr * stmt * stmt           (* if-then-else *)
