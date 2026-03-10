@@ -38,18 +38,18 @@
 
 /* Entry point */
 %start file
-%type <Ast.stmt> file
+%type <Ast.document> file
 
 %%
 
 file:
-| blocks = list(block) EOF      { Sblock blocks }
+| blocks = list(block) EOF      { blocks }
 ;
 
 block:
-| OPEN_CODE s = stmts CLOSE_CODE  { s }
-| ANNOTATION e = expr             { Seval e }
-| t = TEXT                        { Stext t }
+| OPEN_CODE s = stmts CLOSE_CODE  { Script s }
+| ANNOTATION e = expr             { Annotation e }
+| t = TEXT                        { RawText t }
 ;
 
 stmts:
@@ -58,13 +58,10 @@ stmts:
 ;
 
 stmt:
-| FLOAT_T id = ident EQUAL e = expr SEMI    { Sassign (id, e) }
-| BOOL_T  id = ident EQUAL e = expr SEMI    { Sassign (id, e) }
-| STRING_T id = ident EQUAL e = expr SEMI   { Sassign (id, e) }
-| ABBR id = ident EQUAL s = CST SEMI        { Sassign (id, Ec s) }
-| IF LP c = expr RP LBRACE s1 = stmts RBRACE ELSE LBRACE s2 = stmts RBRACE
+| id = ident EQUAL e = expr       { Sassign (id, e) }
+| IF c = expr s1 = stmt ELSE s2 = stmt
     { Sif (c, s1, s2) }
-| IF LP c = expr RP LBRACE s1 = stmts RBRACE
+| IF c = expr s1 = stmt
     { Sif (c, s1, Snop) }
 ;
 
@@ -86,6 +83,6 @@ expr:
 | OR    { Bor  }
 ;
 
-ident:r
+ident:
 | id = IDENT { { loc = ($startpos, $endpos); id } }
 ;
