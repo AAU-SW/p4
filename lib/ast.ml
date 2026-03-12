@@ -3,37 +3,39 @@
 type location = Lexing.position * Lexing.position
 type ident = { loc: location; id: string }
 
-type abbreviation = string
+(* Added strong types *)
+type typ =
+  | TFloat
+  | TBool
+  | TString
+  | TAbbr
 
 type constant =
   | Cfloat of float
   | Cbool of bool
   | Cstring of string
-  | Cabbr of abbreviation
 
-type unop =
-  | Unot
+type unop = Unot
 
 type binop =
-  | Badd | Bsub | Bmul | Bdiv | Bmod    (* + - * / % *)
-  | Beq | Bneq | Blt | Ble | Bgt | Bge  (* == != < <= > >= *)
-  | Band | Bor                           (* and or *)
+  | Badd | Bsub | Bmul | Bdiv | Bmod
+  | Beq | Bneq | Blt | Ble | Bgt | Bge
+  | Band | Bor
 
 type expr =
   | Ec of constant
   | Eident of ident
-  | Ebinop of binop * expr * expr        (* binary operation *)
+  | Ebinop of binop * expr * expr
   | Eunop of unop * expr
+  | Ecall of ident * expr list        (* Added for function calls e.g., today() *)
 
 type stmt =
-  | Sassign of ident * expr              (* assignment *)
-  | Sseq of stmt * stmt                  (* sequence of statements *)
-  | Sif of expr * stmt * stmt            (* if-then-else *)
-  | Snop                                 (* empty branch *)
+  | Svardef of typ * ident * expr     (* e.g., Float f = 0.0; (Immutable assignment) *)
 
 type doc_element =
   | RawText of string
-  | Annotation of expr                   
-  | Script of stmt                       (* The §§ or §/ /§ blocks *)
+  | Annotation of ident * ident       (* e.g., §§ Req(API) *)
+  | Script of stmt list               (* Regular code block *)
+  | IfBlock of expr * document * document (* if(cond) { doc } else { doc } *)
 
-type document = doc_element list
+and document = doc_element list
