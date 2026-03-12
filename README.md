@@ -13,7 +13,7 @@ Store values in variables, e.g., last release year, etc.
 - Variables need to be defined before usage.
 - Variables are strongly typed.
 
-Something alike `today()` **FILL THIS OUT**
+Something alike `today()` _**FILL THIS OUT**_
 
 ```
 Float today = today()
@@ -49,12 +49,23 @@ Define abbreviations, people, etc.
 Used to ensure no terms, abbreviations or people are mentioned as "should be known" before they are defined clearly.
 
 #### Usage
+
+##### Definitions
+
 ```mds
 Abbr API = "Application Programming Interface";
 Abbr CI = "Continuous Integration";
 Abbr MDS = "Markdowns Structured Language";
 Abbr SW4 = "Software Engineering Group 4";
 ```
+
+##### Usage
+
+```mds
+§§ Req(API)
+We built this using the weather data API.
+```
+
 ### Conditionals
 
 Conditional rendering. Can use binary comparisons with hardcoded values and variables. Comparisons need to be done between to values of equal type.
@@ -102,7 +113,7 @@ Could have:
 
 ## Language Guide
 
-To use these features, you need to either do it in a code block at the beginning of your `.mds` file, or do annotations directly in your text.
+To use these features, you need to either do it in a code block or do annotations directly in your text.
 
 To initiate a code block, write `§/` and to end it, write `/§`. 
 

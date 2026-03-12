@@ -1,2 +1,6 @@
+(ocamllex lexer)
+(menhir (modules parser))
+
 (library
- (name p4))
+ (name markdowns_lib)
+ (libraries menhirLib))

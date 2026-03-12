@@ -1,6 +1,6 @@
 (lang dune 3.21)
 
-(name p4)
+(name markdowns)
 
 (generate_opam_files true)
 
@@ -15,8 +15,9 @@
 
 (documentation https://github.com/AAU-SW/p4/blob/main/README.md)
 
+(using menhir 3.0)
 (package
- (name p4)
+ (name markdowns)
  (synopsis "P4: Markdowns, a Markdown Scripting Language")
  (description "A longer description")
  (depends ocaml)
