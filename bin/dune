@@ -1,4 +1,4 @@
 (executable
- (public_name p4)
  (name main)
- (libraries p4))
+ (public_name markdowns)
+ (libraries markdowns_lib))
