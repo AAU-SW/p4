@@ -1,12 +1,50 @@
-# This is a title
+# Who to use MARKDOWNS
+
+We created MARKDOWNS (MDS) because we felt that when using normal Markdown, we ran into the problem of writing the same things over and over again. We couldn't find a good solution to some of the problems in the normal library of vanilla operations, so we have come up with our own functions and some much-needed improvements to normal Markdown.
+## What has we add
+The core of MDS is the ability to store data and only show it when it matters. No more manual copy-pasting of version numbers or project names.
+
+1. The Glossary System
+Instead of guessing what an acronym means, we define it once.
 §/
-Abbr hello = "world";
+Abbr MDS = "Markdowns Structured Language";
+Abbr SW4 = "Software Engineering Group 4";
+Abbr API = "Application Programming Interface";
 /§
 
-This is some text
+By using the annotation §§ Req(MDS) 
+we ensure the reader knows we are talking about the §§ Req(MDS)
+project managed by §§ Req(SW4).
 
-## This is a subtitle
+2. Logic and Variables
+We use strongly typed variables to track our progress.
 
-§§ Req(hello)
+§/
+// Variables are immutable and strongly typed
+Float CurrentVersion = 1.0;
+Float TargetVersion = 2.0;
+Bool IsNotReady = false;
+Bool IsReady = true;
 
-Hello means hello world!
+String StatusMessage = "Work in Progress";
+/§
+
+Current Status: StatusMessage
+Technical Comparison
+We wanted to see if our project is ready for a full release. In normal Markdown, you’d have to delete text manually. In MDS, we use a conditional block:
+§/
+// 1. Initialize the variable first so it exists in this scope
+String Status = "Pending"; 
+
+Float Today = 03.25;
+Float ReleaseDate = 04.01;
+
+if (Today >= ReleaseDate) {
+    Status = "Official Launch";
+} else {
+    Status = "Development Phase";
+}; 
+/§
+
+## §§ Status
+The §§ Req(MDS) system is moving along.
