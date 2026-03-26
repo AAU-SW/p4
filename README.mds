@@ -29,22 +29,30 @@ Bool IsReady = true;
 String StatusMessage = "Work in Progress";
 /§
 
-Current Status: StatusMessage
+Current Status: §§ Req(StatusMessage)
 Technical Comparison
 We wanted to see if our project is ready for a full release. In normal Markdown, you’d have to delete text manually. In MDS, we use a conditional block:
-§/
+
+
 // 1. Initialize the variable first so it exists in this scope
+§/
 String Status = "Pending"; 
 
-Float Today = 03.25;
+Float today = Today();
 Float ReleaseDate = 04.01;
-
-if (Today >= ReleaseDate) {
-    Status = "Official Launch";
-} else {
-    Status = "Development Phase";
-}; 
 /§
+ 
+§§ Req(today)
 
-## §§ Status
-The §§ Req(MDS) system is moving along.
+if  §§ Req(today) {
+    The date is §§ Req(today)
+}else{
+The release is §§ Req(ReleaseDate)
+ }
+## Why this is better
+No more "Search and Replace": Change a variable once, and it updates the whole file.
+
+Type Safety: You can't accidentally compare a Bool to a Float.
+
+Clean Annotations: Using  it clear where a definition is required.
+
