@@ -12,9 +12,11 @@ Abbr SW4 = "Software Engineering Group 4";
 Abbr API = "Application Programming Interface";
 /§
 
-By using the annotation §§ Req(MDS) 
-we ensure the reader knows we are talking about the §§ Req(MDS)
-project managed by §§ Req(SW4).
+By using the annotation `§§ Req(MDS)` 
+§§ Req(MDS)
+we ensure the reader knows we are talking about the MDS 
+§§ Req(SW4)
+project managed by SW4.
 
 2. Logic and Variables
 We use strongly typed variables to track our progress.
