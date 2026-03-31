@@ -47,7 +47,7 @@ Float ReleaseDate = 04.01;
 §§ Req(today)
 
 if  §§ Req(today) {
-    The date is §§ Req(today)
+    The date is §{today}
 }else{
 The release is §§ Req(ReleaseDate)
  }
