@@ -49,7 +49,7 @@ Float ReleaseDate = 04.01;
 if  §§ Req(today) {
     The date is §{today}
 }else{
-The release is §§ Req(ReleaseDate)
+The release is §{ReleaseDate}
  }
 ## Why this is better
 No more "Search and Replace": Change a variable once, and it updates the whole file.
