@@ -1,0 +1,44 @@
+# Markdowns Feature Test
+
+$/
+// 1. GLOSSARY DEFINITIONS
+Abbr MDS = "Markdowns Structured Language";
+Abbr OCaml = "Objective Caml";
+
+// 2. VARIABLE INITIALIZATION (All supported types)
+String author = "SW4 Group";
+Int version_major = 1;
+Float build_time = 0.5;
+Bool is_ready = true;
+
+// 3. BUILT-IN FUNCTIONS
+Int current_date = Today();
+Int release_date = 1774994400;
+/$
+
+## Metadata
+Compiled by: ${author}
+Version: ${version_major}.0
+Build time: ${build_time} seconds
+
+## Glossary Usage
+$$ Req(MDS)
+This file is written in MDS and compiled using a custom lexer and parser.
+$$ Req(OCaml)
+The underlying compiler is written in OCaml.
+
+## Conditionals
+
+$/ if (is_ready == true) { /$
+### ✅ Status: Ready for Review
+The compiler successfully evaluated a boolean comparison!
+$/ } /$
+
+$/ if (current_date >= release_date) { /$
+### 🚀 Release Status: Launched!
+The current date has surpassed the target release date.
+$/ } else { /$
+### ⏳ Release Status: In Development
+We are still waiting for the release date.
+Variables evaluated: Int >= Int comparison successful.
+$/ } /$

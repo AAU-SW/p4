@@ -1,96 +1,97 @@
 {
-  open Lexing
-  open Ast
   open Parser
-
-  exception Lexing_error of string
-
-  let id_or_kwd =
-    let h = Hashtbl.create 32 in
-    List.iter (fun (s, tok) -> Hashtbl.add h s tok)
-      [
-        "if", IF; "else", ELSE;
-        "and", AND; "or", OR; "not", NOT;
-        "true", CST (Cbool true);
-        "false", CST (Cbool false);
-        "Float", TFLOAT; "Bool", TBOOL; "String", TSTRING; "Abbr", TABBR; (* Types added *)
-      ];
-    fun s -> try Hashtbl.find h s with Not_found -> IDENT s
-
-  let string_buffer = Buffer.create 1024
+  type mode = Markdown | Code | Template | Annotation | VerbatimBlock | VerbatimInline
+  let current_mode = ref Markdown
 }
 
-let letter = ['a'-'z' 'A'-'Z']
-let digit = ['0'-'9']
-let ident = (letter | '_') (letter | digit | '_' | '-')*
-let float_literal = digit+ '.' digit* | '.' digit+
 let white = [' ' '\t']+
-let newline = '\r' | '\n' | "\r\n"
+let newline = '\n' | "\r\n" | '\r'
+let ident = ['a'-'z' 'A'-'Z' '_'] ['a'-'z' 'A'-'Z' '0'-'9' '_']*
 
-rule next_tokens = parse
-  | eof             { [EOF] }
-  | white as w      { [TEXT w] }
-  | newline as n    { new_line lexbuf; [TEXT n] }
-  | "§/"            { OPEN_CODE :: (read_code [] lexbuf) }
-  | "§§"            { ANNOTATION :: (read_oneline_code [] lexbuf) }
-  | _ as c          { [TEXT (String.make 1 c)] }
+rule read_markdown = parse
+  | "$/"      { current_mode := Code; CODE_START }
+  | "$$"      { current_mode := Annotation; ANNOTATION_START }
+  | "${"      { current_mode := Template; TEMPLATE_START }
+  | "```"     { current_mode := VerbatimBlock; MARKDOWN_TEXT "```" }
+  | "`"       { current_mode := VerbatimInline; MARKDOWN_TEXT "`" }
+  | [^ '$' '`' '\n' '\r']+ as s { MARKDOWN_TEXT s }
+  | newline as nl { Lexing.new_line lexbuf; MARKDOWN_TEXT nl }
+  | '$'       { MARKDOWN_TEXT "$" }
+  | eof       { EOF }
 
-and read_code acc = parse
-  | white           { read_code acc lexbuf }
-  | newline         { new_line lexbuf; read_code acc lexbuf }
-  | "/§"            { List.rev (CLOSE_CODE :: acc) }
-  | ident as id     { read_code ((id_or_kwd id) :: acc) lexbuf }
-  | float_literal as f { read_code (CST (Cfloat (float_of_string f)) :: acc) lexbuf }
-  | digit+ as i        { read_code (CST (Cfloat (float_of_string i)) :: acc) lexbuf }
-  | '"'                { Buffer.reset string_buffer; read_code (CST (Cstring (string lexbuf)) :: acc) lexbuf }
-  | "+"             { read_code (PLUS :: acc) lexbuf }
-  | "-"             { read_code (MINUS :: acc) lexbuf }
-  | "*"             { read_code (TIMES :: acc) lexbuf }
-  | "/"             { read_code (DIV :: acc) lexbuf }
-  | "="             { read_code (EQUAL :: acc) lexbuf }
-  | "=="            { read_code (CMP Beq :: acc) lexbuf }
-  | "!="            { read_code (CMP Bneq :: acc) lexbuf }
-  | "<"             { read_code (CMP Blt :: acc) lexbuf }
-  | "<="            { read_code (CMP Ble :: acc) lexbuf }
-  | ">"             { read_code (CMP Bgt :: acc) lexbuf }
-  | ">="            { read_code (CMP Bge :: acc) lexbuf }
-  | "("             { read_code (LP :: acc) lexbuf }
-  | ")"             { read_code (RP :: acc) lexbuf }
-  | "{"             { read_code (LBRACE :: acc) lexbuf } (* Added Braces *)
-  | "}"             { read_code (RBRACE :: acc) lexbuf }
-  | ";"             { read_code (SEMI :: acc) lexbuf }   (* Added Semicolons *)
-  | ","             { read_code (COMMA :: acc) lexbuf }
-  | "//" [^'\n']* { read_code acc lexbuf }
-  | eof             { raise (Lexing_error "Code block not closed before EOF") }
-  | _ as c          { raise (Lexing_error ("Illegal character in code block: " ^ String.make 1 c)) }
+and read_code = parse
+  | "/$"      { current_mode := Markdown; CODE_END }
+  | white     { read_code lexbuf }
+  | newline   { Lexing.new_line lexbuf; read_code lexbuf }
+  | "//" [^ '\n']* (newline | eof) { Lexing.new_line lexbuf; read_code lexbuf }
+  | "Float"   { T_FLOAT }
+  | "Int"     { T_INT }
+  | "Bool"    { T_BOOL }
+  | "String"  { T_STRING }
+  | "Abbr"    { ABBR }
+  | "if"      { IF }
+  | "else"    { ELSE }
+  | "true"    { BOOL_LIT true }
+  | "false"   { BOOL_LIT false }
+  | "=="      { EQ_OP }
+  | ">="      { GTEQ_OP }
+  | "<="      { LTEQ_OP }
+  | ">"       { GT_OP }
+  | "<"       { LT_OP }
+  | "="       { ASSIGN }
+  | ";"       { SEMI }
+  | "("       { LPAREN }
+  | ")"       { RPAREN }
+  | "{"       { LBRACE }
+  | "}"       { IF_END }
+  | '"'       { read_string (Buffer.create 16) lexbuf }
+  | ['0'-'9']+ as i { INT_LIT (int_of_string i) }
+  | ['0'-'9']+ '.' ['0'-'9']* as f { FLOAT_LIT (float_of_string f) }
+  | ident as id { IDENT id }
+  | _         { failwith ("Unexpected character in code block: " ^ Lexing.lexeme lexbuf) }
 
-and string = parse
-  | '"'             { Buffer.contents string_buffer }
-  | "\\n"           { Buffer.add_char string_buffer '\n'; string lexbuf }
-  | "\\\""          { Buffer.add_char string_buffer '"'; string lexbuf }
-  | _ as c          { Buffer.add_char string_buffer c; string lexbuf }
-  | eof             { raise (Lexing_error "unterminated string") }
+and read_template = parse
+  | "}"       { current_mode := Markdown; TEMPLATE_END }
+  | white     { read_template lexbuf }
+  | ident as id { IDENT id }
+  | _         { failwith "Invalid character inside template block" }
 
-and read_oneline_code acc = parse
-  | white               { read_oneline_code acc lexbuf }
-  | newline             { new_line lexbuf; List.rev acc }
-  | ident as id         { read_oneline_code ((id_or_kwd id) :: acc) lexbuf }
-  | float_literal as f  { read_oneline_code (CST (Cfloat (float_of_string f)) :: acc) lexbuf }
-  | digit+ as i         { read_oneline_code (CST (Cfloat (float_of_string i)) :: acc) lexbuf }
-  | '"'                 { Buffer.reset string_buffer; read_oneline_code (CST (Cstring (string lexbuf)) :: acc) lexbuf }
-  | "="                 { read_oneline_code (EQUAL :: acc) lexbuf }
-  | "("                 { read_oneline_code (LP :: acc) lexbuf }
-  | ")"                 { read_oneline_code (RP :: acc) lexbuf }
-  | eof                 { List.rev (EOF :: acc) }
-  | _                   { read_oneline_code acc lexbuf } (* Ignore other chars in annotations for brevity *)
+and read_annotation = parse
+  | white     { read_annotation lexbuf }
+  | "("       { LPAREN }
+  | ")"       { RPAREN }
+  | ident as id { IDENT id }
+  | newline   { Lexing.new_line lexbuf; current_mode := Markdown; ANNOTATION_END }
+  | eof       { current_mode := Markdown; ANNOTATION_END }
+  | _ as c    { failwith (Printf.sprintf "Unexpected character in annotation: '%c'" c) }
+
+and read_string buf = parse
+  | '"'       { STRING_LIT (Buffer.contents buf) }
+  | '\\' 'n'  { Buffer.add_char buf '\n'; read_string buf lexbuf }
+  | '\\' '"'  { Buffer.add_char buf '"'; read_string buf lexbuf }
+  | _ as c    { Buffer.add_char buf c; read_string buf lexbuf }
+  | eof       { failwith "Unterminated string literal" }
+
+and read_verbatim_block = parse
+  | "```"     { current_mode := Markdown; MARKDOWN_TEXT "```" }
+  | [^ '`' '\n' '\r']+ as s { MARKDOWN_TEXT s }
+  | newline as nl { Lexing.new_line lexbuf; MARKDOWN_TEXT nl }
+  | '`'       { MARKDOWN_TEXT "`" }
+  | eof       { EOF }
+
+and read_verbatim_inline = parse
+  | "`"       { current_mode := Markdown; MARKDOWN_TEXT "`" }
+  | [^ '`' '\n' '\r']+ as s { MARKDOWN_TEXT s }
+  | newline as nl { Lexing.new_line lexbuf; MARKDOWN_TEXT nl }
+  | eof       { EOF }
 
 {
-  let next_token =
-    let tokens = Queue.create () in
-    fun lb ->
-      if Queue.is_empty tokens then begin
-        let l = next_tokens lb in
-        List.iter (fun t -> Queue.add t tokens) l
-      end;
-      Queue.pop tokens
+  let token lexbuf =
+    match !current_mode with
+    | Markdown -> read_markdown lexbuf
+    | Code -> read_code lexbuf
+    | Template -> read_template lexbuf
+    | Annotation -> read_annotation lexbuf
+    | VerbatimBlock -> read_verbatim_block lexbuf
+    | VerbatimInline -> read_verbatim_inline lexbuf
 }
