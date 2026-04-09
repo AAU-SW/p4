@@ -12,7 +12,7 @@ Abbr SW4 = "Software Engineering Group 4";
 Abbr API = "Application Programming Interface";
 /$
 
-By using the annotation `$$ Req(MDS)`
+By using the annotation `$$ Req(...)`, we can reference these definitions throughout the document. For example:
 $$ Req(MDS)
 we ensure the reader knows we are talking about the MDS
 $$ Req(SW4)
@@ -31,7 +31,7 @@ Bool IsReady = true;
 String StatusMessage = "Work in Progress";
 /$
 
-Current Status: $$ Req(StatusMessage)
+Current Status: ${StatusMessage}
 Technical Comparison
 We wanted to see if our project is ready for a full release. In normal Markdown, you’d have to delete text manually. In MDS, we use a conditional block:
 
@@ -40,17 +40,15 @@ We wanted to see if our project is ready for a full release. In normal Markdown,
 $/
 String Status = "Pending";
 
-Float today = Today();
-Float ReleaseDate = 04.01;
+Int today = Today();
+Int releaseDate = 1774994400;
 /$
 
-$$ Req(today)
-
-if  $$ Req(today) {
-    The date is ${today}
-}else{
-The release is ${ReleaseDate}
- }
+$/ if (today > releaseDate) { /$
+  The date is ${today}
+$/ } else { /$
+  The release is ${releaseDate}
+$/ } /$
 ## Why this is better
 No more "Search and Replace": Change a variable once, and it updates the whole file.
 
