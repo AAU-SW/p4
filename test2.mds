@@ -1,3 +1,7 @@
+$/
+Bool is_date_type_supported = false;
+/$
+
 # Markdowns
 
 ## Features
@@ -15,17 +19,12 @@ Store values in variables, e.g., last release year, etc.
 
 Something alike `Today()` _**FILL THIS OUT**_
 
-```
+```mds
 $/
 Int today = Today()
 /$
 ```
 
-<!-- 
-Could have: Date parsing to unix timestamp
-E.g. `Date release_date = parse_date(12-23-2026)`
-(Should it come with a Date type or just use float?)
- -->
 
 #### Usage
 
@@ -36,8 +35,11 @@ The types are:
 - Int
 - Bool
 - String
-
+$/ if (is_date_type_supported) { /$
+- Date
+$/ } else { /$
 Important: Date type is not supported, but can be represented as a unix timestamp using the `Int` type.
+$/ } /$
 
 ```mds
 $/
@@ -50,6 +52,11 @@ Bool is_release = true;
 String author = "SW4";
 /$
 ```
+
+$/ if (is_date_type_supported) { /$
+### Date parsing to unix timestamp
+E.g. `Date release_date = parse_date(12-23-2026)`
+$/ } /$
 
 ### Glossary
 

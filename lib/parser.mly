@@ -1,112 +1,78 @@
-/* Parser for Markdowns */
-
 %{
-  open Ast
+  open Ptree
+  let mk_loc start_pos end_pos node = { node; ident = (start_pos, end_pos) }
 %}
 
-/* Tokens */
-%token <Ast.constant> CST
-%token <Ast.binop> CMP
-%token <string> IDENT
+%token <string> MARKDOWN_TEXT IDENT STRING_LIT
+%token <int> INT_LIT
+%token <float> FLOAT_LIT
+%token <bool> BOOL_LIT
+%token T_INT T_FLOAT T_BOOL T_STRING ABBR IF ELSE
+%token ASSIGN EQ_OP GT_OP GTEQ_OP LTEQ_OP LT_OP
+%token SEMI LPAREN RPAREN LBRACE IF_END
+%token CODE_START CODE_END TEMPLATE_START TEMPLATE_END ANNOTATION_START ANNOTATION_END EOF
 
-%token TFLOAT TBOOL TSTRING TABBR
-%token IF ELSE
-%token AND OR NOT
+%left EQ_OP GT_OP GTEQ_OP LTEQ_OP LT_OP
 
-%token EQUAL
-%token PLUS MINUS TIMES DIV
-%token LP RP LBRACE RBRACE
-%token SEMI COMMA
-
-%token OPEN_CODE CLOSE_CODE
-%token ANNOTATION
-%token <string> TEXT
-
-%token EOF
-
-/* Precedence */
-%left OR
-%left AND
-%nonassoc NOT
-%nonassoc CMP
-%left PLUS MINUS
-%left TIMES DIV
-
-/* Entry point */
-%start file
-%type <Ast.document> file
-
+%start <Ptree.program> program
 %%
 
-file:
-| doc = document EOF { doc }
-;
+program:
+  | block_elements EOF { $1 }
 
-document:
-| /* empty */                 { [] }
-| b = block rest = document   { b :: rest }
-;
+block_elements:
+  | /* empty */ { [] }
+  | block_element block_elements { $1 :: $2 }
 
-block:
-| OPEN_CODE s = stmts CLOSE_CODE                 { Script s }
-| ANNOTATION tag = ident LP arg = ident RP       { Annotation (tag, arg) }
+block_element:
+  | MARKDOWN_TEXT { mk_loc $startpos $endpos (Markdown $1) }
+  | TEMPLATE_START IDENT TEMPLATE_END { mk_loc $startpos $endpos (Template $2) }
+  | ANNOTATION_START IDENT LPAREN IDENT RPAREN ANNOTATION_END { mk_loc $startpos $endpos (Annotation ($2, [$4])) }
+  | CODE_START stmts CODE_END { mk_loc $startpos $endpos (CodeBlock $2) }
 
-/* Handles: §/ if (expr) { /§ [markdown] §/ } else { /§ [markdown] §/ } /§ */
-| OPEN_CODE IF LP c = expr RP LBRACE CLOSE_CODE
-  d1 = document
-  OPEN_CODE RBRACE ELSE LBRACE CLOSE_CODE
-  d2 = document
-  OPEN_CODE RBRACE CLOSE_CODE                    { IfBlock (c, d1, d2) }
+  /* These rules now use left-factored recursion to resolve LR(1) lookahead conflicts */
+  | CODE_START IF LPAREN expr RPAREN LBRACE CODE_END if_body
+      {
+        let (then_br, else_br) = $8 in
+        mk_loc $startpos $endpos (IfElse ($4, then_br, else_br))
+      }
 
-/* Handles: §/ if (expr) { /§ [markdown] §/ } /§ (No Else branch) */
-| OPEN_CODE IF LP c = expr RP LBRACE CLOSE_CODE
-  d1 = document
-  OPEN_CODE RBRACE CLOSE_CODE                    { IfBlock (c, d1, []) }
+/* Specialized right-recursive lists to handle if/else block closures */
+if_body:
+  | CODE_START IF_END CODE_END { ([], None) }
+  | CODE_START IF_END ELSE LBRACE CODE_END if_else_body { ([], Some $6) }
+  | block_element if_body {
+      let (then_stmts, else_opt) = $2 in
+      ($1 :: then_stmts, else_opt)
+    }
 
-| text = raw_text                                { RawText text }
-;
-
-/* Left-recursive concatenation of adjacent text tokens */
-raw_text:
-| t = TEXT                      { t }
-| rest = raw_text t = TEXT      { rest ^ t }
-;
+if_else_body:
+  | CODE_START IF_END CODE_END { [] }
+  | block_element if_else_body { $1 :: $2 }
 
 stmts:
-| /* empty */           { [] }
-| s = stmt rest = stmts { s :: rest }
-;
+  | /* empty */ { [] }
+  | stmt stmts { $1 :: $2 }
 
 stmt:
-| t = typ id = ident EQUAL e = expr SEMI { Svardef (t, id, e) }
-;
+  | mds_type IDENT ASSIGN expr SEMI { mk_loc $startpos $endpos (SVarDecl ($1, $2, $4)) }
+  | ABBR IDENT ASSIGN STRING_LIT SEMI { mk_loc $startpos $endpos (SAbbrDecl ($2, $4)) }
 
-typ:
-| TFLOAT  { TFloat }
-| TBOOL   { TBool }
-| TSTRING { TString }
-| TABBR   { TAbbr }
-;
+mds_type:
+  | T_INT { TyInt }
+  | T_FLOAT { TyFloat }
+  | T_BOOL { TyBool }
+  | T_STRING { TyString }
 
 expr:
-| c = CST                         { Ec c }
-| id = ident                      { Eident id }
-| id = ident LP args = separated_list(COMMA, expr) RP { Ecall (id, args) } /* Parses today() */
-| e1 = expr o = binop e2 = expr   { Ebinop (o, e1, e2) }
-| e1 = expr o = CMP  e2 = expr    { Ebinop (o, e1, e2) }
-| NOT e1 = expr                   { Eunop (Unot, e1) }
-| LP e = expr RP                  { e }
-;
-
-%inline binop:
-| PLUS  { Badd }
-| MINUS { Bsub }
-| TIMES { Bmul }
-| DIV   { Bdiv }
-| AND   { Band }
-| OR    { Bor  }
-;
-
-ident:
-| id = IDENT { { loc = ($startpos, $endpos); id } }
-;
+  | INT_LIT { mk_loc $startpos $endpos (EInt $1) }
+  | FLOAT_LIT { mk_loc $startpos $endpos (EFloat $1) }
+  | BOOL_LIT { mk_loc $startpos $endpos (EBool $1) }
+  | STRING_LIT { mk_loc $startpos $endpos (EString $1) }
+  | IDENT { mk_loc $startpos $endpos (EVar $1) }
+  | IDENT LPAREN RPAREN { mk_loc $startpos $endpos (ECall ($1, [])) }
+  | expr EQ_OP expr { mk_loc $startpos $endpos (EBinop (Eq, $1, $3)) }
+  | expr GT_OP expr { mk_loc $startpos $endpos (EBinop (Gt, $1, $3)) }
+  | expr GTEQ_OP expr { mk_loc $startpos $endpos (EBinop (GtEq, $1, $3)) }
+  | expr LTEQ_OP expr { mk_loc $startpos $endpos (EBinop (LtEq, $1, $3)) }
+  | expr LT_OP expr { mk_loc $startpos $endpos (EBinop (Lt, $1, $3)) }

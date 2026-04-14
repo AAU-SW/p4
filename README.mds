@@ -6,22 +6,22 @@ The core of MDS is the ability to store data and only show it when it matters. N
 
 1. The Glossary System
 Instead of guessing what an acronym means, we define it once.
-§/
+$/
 Abbr MDS = "Markdowns Structured Language";
 Abbr SW4 = "Software Engineering Group 4";
 Abbr API = "Application Programming Interface";
-/§
+/$
 
-By using the annotation `§§ Req(MDS)` 
-§§ Req(MDS)
-we ensure the reader knows we are talking about the MDS 
-§§ Req(SW4)
+By using the annotation `$$ Req(...)`, we can reference these definitions throughout the document. For example:
+$$ Req(MDS)
+we ensure the reader knows we are talking about the MDS
+$$ Req(SW4)
 project managed by SW4.
 
 2. Logic and Variables
 We use strongly typed variables to track our progress.
 
-§/
+$/
 // Variables are immutable and strongly typed
 Float CurrentVersion = 1.0;
 Float TargetVersion = 2.0;
@@ -29,32 +29,29 @@ Bool IsNotReady = false;
 Bool IsReady = true;
 
 String StatusMessage = "Work in Progress";
-/§
+/$
 
-Current Status: §§ Req(StatusMessage)
+Current Status: ${StatusMessage}
 Technical Comparison
 We wanted to see if our project is ready for a full release. In normal Markdown, you’d have to delete text manually. In MDS, we use a conditional block:
 
 
 // 1. Initialize the variable first so it exists in this scope
-§/
-String Status = "Pending"; 
+$/
+String Status = "Pending";
 
-Float today = Today();
-Float ReleaseDate = 04.01;
-/§
- 
-§§ Req(today)
+Int today = Today();
+Int releaseDate = 1774994400;
+/$
 
-if  §§ Req(today) {
-    The date is §{today}
-}else{
-The release is §{ReleaseDate}
- }
+$/ if (today > releaseDate) { /$
+  The date is ${today}
+$/ } else { /$
+  The release is ${releaseDate}
+$/ } /$
 ## Why this is better
 No more "Search and Replace": Change a variable once, and it updates the whole file.
 
 Type Safety: You can't accidentally compare a Bool to a Float.
 
 Clean Annotations: Using  it clear where a definition is required.
-
