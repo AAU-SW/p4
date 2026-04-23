@@ -89,6 +89,10 @@ Larger than `>`
 
 Larger than or equal to `>=`
 
+Smaller than `<`
+
+Smaller than or equal to `<=`
+
 ```mds
 $/
 Int releaseDate = 1774994400;
