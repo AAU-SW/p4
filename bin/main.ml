@@ -23,14 +23,18 @@ let rec compress_markdown acc (blocks : Ptree.block_element list) =
       compress_markdown (b' :: acc) rest
 
 let () =
-  if Array.length Sys.argv < 2 then begin
-    Printf.eprintf "Usage: %s <filename.mds>\n" Sys.argv.(0);
+  if Array.length Sys.argv < 3 then begin
+    Printf.eprintf "Usage: %s <filename.mds> %s <output_filename.md>\n" Sys.argv.(0) Sys.argv.(1);
     exit 1
   end;
 
   let filename = Sys.argv.(1) in
   let in_channel = open_in filename in
   let lexbuf = Lexing.from_channel in_channel in
+
+  let output_filename = Sys.argv.(2) in
+  let out_channel = open_out output_filename in
+
 
   Lexing.set_filename lexbuf filename;
 
