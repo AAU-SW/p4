@@ -1,0 +1,42 @@
+$/
+// 1. Variable Declarations (All Types)
+String doc_title = "MDS Full Feature Test";
+Int major_version = 1;
+Float build_time = 0.42;
+Bool tests_passing = true;
+
+// 2. Built-in Functions & Comparisons
+Int current_time = Today();
+Int past_time = 1500000000;
+
+// 3. Glossary Abbreviations
+Abbr AST = "Abstract Syntax Tree";
+Abbr OCaml = "Objective Caml";
+/$
+
+# ${doc_title}
+**Version:** ${major_version}.0 (Built in ${build_time}s)
+
+This file is designed to test the code generation phase of the compiler.
+
+## Glossary & Annotations Test
+$$ Req(AST)
+Our compiler successfully merged the adjacent Markdown nodes in the AST.
+$$ Req(OCaml)
+The rendering engine is built using standard OCaml pattern matching.
+
+## Conditionals & Logic Test
+
+$/ if (tests_passing == true) { /$
+> ✅ **Evaluation Success:** The boolean expression evaluated to true!
+$/ } else { /$
+> ❌ **Evaluation Failure:** This branch should not be visible.
+$/ } /$
+
+$/ if (current_time > past_time) { /$
+### Time Check: Normal
+The `Today()` function returned a timestamp (${current_time}) that is greater than our hardcoded past date.
+$/ } else { /$
+### Time Check: Error
+Unless you invented time travel, this branch should not render.
+$/ } /$
