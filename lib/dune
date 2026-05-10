@@ -3,4 +3,4 @@
 
 (library
  (name markdowns_lib)
- (libraries menhirLib))
+ (libraries menhirLib unix))
