@@ -46,10 +46,15 @@ let () =
     let ast = compress_markdown [] raw_ast in
 
     (* 3. Print the optimized AST *)
-    Printer.print_program ast;
+    (* Printer.print_program ast; *)
 
     (* 4. Typecheck the AST *)
-    let _typed_ast = Typing.typecheck ast in
+    let typed_ast = Typing.typecheck ast in
+
+    (* Codegen *)
+    let final_markdown = Codegen.generate typed_ast in
+    (* Print to file *)
+    Printf.fprintf out_channel "%s\n" final_markdown;
 
     Printf.printf "🎉 Success! '%s' parsed and typechecked with no errors.\n" filename;
     close_in in_channel
