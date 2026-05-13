@@ -1,3 +1,7 @@
 (test
- (name test_markdowns)
- (libraries markdowns_lib))
+ (name parser_test)
+ (libraries markdowns_lib alcotest))
+
+(test
+ (name lexer_test)
+ (libraries markdowns_lib alcotest))
