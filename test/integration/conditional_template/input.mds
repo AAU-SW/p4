@@ -1,0 +1,7 @@
+$/
+Bool is_ready = true;
+/$
+$/ if (is_ready == true) { /$
+### ✅ Status: Ready for Review
+The compiler successfully evaluated a boolean comparison!
+$/ } /$
