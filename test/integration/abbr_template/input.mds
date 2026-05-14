@@ -1,0 +1,7 @@
+$/
+Abbr API = "Application Programming Interface";
+Abbr CI = "Continuous Integration";
+/$
+
+$$ Req(API)
+We built this using the weather data API.
