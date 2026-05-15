@@ -5,3 +5,7 @@
 (test
  (name lexer_test)
  (libraries markdowns_lib alcotest))
+
+(test
+ (name acceptance_test)
+ (libraries markdowns_lib alcotest))
