@@ -1,3 +1,4 @@
+(include_subdirs no)
 (test
  (name integration_test)
  (libraries markdowns_lib alcotest))

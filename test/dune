@@ -1,7 +1,8 @@
+(include_subdirs unqualified)
+
 (test
  (name parser_test)
  (libraries markdowns_lib alcotest))
-
 (test
  (name lexer_test)
  (libraries markdowns_lib alcotest))
