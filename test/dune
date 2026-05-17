@@ -13,3 +13,7 @@
 (test
  (name typing_test)
  (libraries markdowns_lib alcotest))
+
+(test
+ (name acceptance_test)
+ (libraries markdowns_lib alcotest))
